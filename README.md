@@ -8,6 +8,7 @@ A Next.js + Firebase marketplace for cars where buyers can inspect listings and 
 - True-scale AR eligibility checks based on model QA and dimensions.
 - Inquiry submission workflow (lead-gen, no checkout).
 - Admin portal for listing updates, model moderation, and publish control.
+- Google Drive folder integration in admin (fetch public GLB/USDZ files by folder URL/ID).
 - Firestore + Storage security rules.
 - Netlify deployment config and Firebase setup scripts.
 
@@ -64,6 +65,16 @@ Then in Netlify:
 - Add environment variables from `.env.example`.
 - Connect repository for preview + production deployments.
 - Trigger deploy.
+
+## Google Drive API Setup (Folder-Based Model Import)
+
+1. In Google Cloud Console, enable **Google Drive API** for the project.
+2. Create an API key and restrict it as needed.
+3. Set `GOOGLE_DRIVE_API_KEY` in local `.env.local` and Netlify environment variables.
+4. In Admin portal, paste a public Drive folder URL/ID and click **Fetch Folder Files**.
+5. Pick detected GLB/USDZ entries or use the auto-selected recommendations.
+
+> The files inside that folder must be shared publicly; private files are not readable by the API key flow.
 
 ## Useful Scripts
 - `npm run dev` - local dev server

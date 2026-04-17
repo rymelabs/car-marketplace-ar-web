@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CarModelAsset } from "@/types/marketplace";
 import { getArEligibility } from "@/lib/ar";
+import { isGoogleDriveUrl, normalizeModelAssetUrl } from "@/lib/model-asset-url";
 
 interface ArModelViewerProps {
   model?: CarModelAsset;
@@ -24,6 +25,14 @@ export function ArModelViewer({ model }: ArModelViewerProps) {
   const [isSecureContextReady, setIsSecureContextReady] = useState(true);
 
   const eligibility = useMemo(() => getArEligibility(model), [model]);
+  const glbSrc = useMemo(
+    () => normalizeModelAssetUrl(model?.glbPath),
+    [model?.glbPath],
+  );
+  const usdzSrc = useMemo(
+    () => normalizeModelAssetUrl(model?.usdzPath),
+    [model?.usdzPath],
+  );
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -163,8 +172,8 @@ export function ArModelViewer({ model }: ArModelViewerProps) {
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
         <model-viewer
           ref={modelViewerRef}
-          src={model.glbPath}
-          ios-src={model.usdzPath}
+          src={glbSrc}
+          ios-src={usdzSrc}
           ar={eligibility.eligible}
           ar-modes="scene-viewer quick-look webxr"
           ar-placement="floor"
@@ -196,6 +205,11 @@ export function ArModelViewer({ model }: ArModelViewerProps) {
       {!isSecureContextReady ? (
         <p className="mt-2 text-xs text-amber-700">
           Camera AR is blocked on non-HTTPS origins. Use localhost or deploy to HTTPS to test on a mobile device.
+        </p>
+      ) : null}
+      {isGoogleDriveUrl(model.glbPath) || isGoogleDriveUrl(model.usdzPath) ? (
+        <p className="mt-2 text-xs text-amber-700">
+          Google Drive links must be publicly accessible. If AR fails, host the model in Firebase Storage or a CDN.
         </p>
       ) : null}
     </section>

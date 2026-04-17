@@ -21,6 +21,16 @@ const mediaRefSchema = z.object({
   alt: z.string().min(2).max(200),
 });
 
+const createOrUpdateModelAssetInputSchema = z.object({
+  id: z.string().min(2).optional(),
+  glbPath: z.string().min(2),
+  usdzPath: z.string().min(2).optional(),
+  dimensionsMeters: dimensionsSchema,
+  normalizedScale: z.number().positive().default(1),
+  qaStatus: z.enum(["pending", "approved", "rejected"]).default("approved"),
+  sourceType: z.enum(["curated", "uploaded"]).default("curated"),
+});
+
 export const inquiryPayloadSchema = z.object({
   carId: z.string().min(2),
   buyerId: z.string().min(2).optional(),
@@ -44,7 +54,17 @@ export const createOrUpdateCarSchema = z.object({
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   specs: specsSchema,
   mediaRefs: z.array(mediaRefSchema).max(20),
-  modelRefId: z.string().min(2),
+  modelRefId: z.string().min(2).optional(),
+  modelAssetInput: createOrUpdateModelAssetInputSchema.optional(),
+}).superRefine((input, context) => {
+  if (!input.modelRefId && !input.modelAssetInput) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["modelRefId"],
+      message:
+        "Provide either an existing modelRefId or a modelAssetInput payload.",
+    });
+  }
 });
 
 export const publishCarSchema = z.object({

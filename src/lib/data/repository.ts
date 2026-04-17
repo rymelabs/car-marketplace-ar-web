@@ -17,6 +17,7 @@ import {
 } from "@/lib/validation";
 import { seedCars, seedModels, seedModelUploads, seedUsers } from "@/data/seed";
 import { getFirebaseAdminFirestore } from "@/lib/firebase/admin";
+import { normalizeModelAssetUrl } from "@/lib/model-asset-url";
 
 const useFirestore =
   process.env.USE_FIREBASE_DATA === "1" && Boolean(process.env.FIREBASE_PROJECT_ID);
@@ -156,17 +157,53 @@ export async function getCarById(
 
 export async function createOrUpdateCar(input: CreateOrUpdateCarInput): Promise<CarListing> {
   const now = new Date().toISOString();
+  const { modelAssetInput, modelRefId: providedModelRefId, ...carFields } = input;
+  const carId = input.id ?? makeId("car");
+  let resolvedModelRefId = providedModelRefId?.trim();
 
   if (useFirestore) {
     const db = getFirebaseAdminFirestore();
-    const id = input.id ?? makeId("car");
+    const id = carId;
 
     const existing = await db.collection("cars").doc(id).get();
     const existingData = existing.exists ? (existing.data() as CarListing) : undefined;
+    resolvedModelRefId = resolvedModelRefId ?? existingData?.modelRefId;
+
+    if (modelAssetInput) {
+      const modelId =
+        modelAssetInput.id?.trim() ||
+        resolvedModelRefId ||
+        `model_${id}`;
+
+      const modelValue: CarModelAsset = {
+        id: modelId,
+        carId: id,
+        glbPath:
+          normalizeModelAssetUrl(modelAssetInput.glbPath) ??
+          modelAssetInput.glbPath,
+        usdzPath: normalizeModelAssetUrl(modelAssetInput.usdzPath),
+        dimensionsMeters: modelAssetInput.dimensionsMeters,
+        normalizedScale: modelAssetInput.normalizedScale,
+        qaStatus: modelAssetInput.qaStatus,
+        sourceType: modelAssetInput.sourceType,
+        approvedAt: modelAssetInput.qaStatus === "approved" ? now : undefined,
+        version: existingData?.id ? "1.0.0" : "1.0.0",
+      };
+
+      await db.collection("carModels").doc(modelId).set(modelValue, { merge: true });
+      resolvedModelRefId = modelId;
+    }
+
+    if (!resolvedModelRefId) {
+      throw new Error(
+        "Missing model reference. Provide modelRefId or modelAssetInput.",
+      );
+    }
 
     const nextValue: CarListing = {
       id,
-      ...input,
+      ...carFields,
+      modelRefId: resolvedModelRefId,
       createdAt: existingData?.createdAt ?? now,
       updatedAt: now,
     };
@@ -179,12 +216,53 @@ export async function createOrUpdateCar(input: CreateOrUpdateCarInput): Promise<
     ? memoryState.cars.findIndex((car) => car.id === input.id)
     : -1;
 
+  const existingCar = existingIndex >= 0 ? memoryState.cars[existingIndex] : undefined;
+  resolvedModelRefId = resolvedModelRefId ?? existingCar?.modelRefId;
+
+  if (modelAssetInput) {
+    const modelId =
+      modelAssetInput.id?.trim() ||
+      resolvedModelRefId ||
+      `model_${carId}`;
+
+    const model: CarModelAsset = {
+      id: modelId,
+      carId,
+      glbPath:
+        normalizeModelAssetUrl(modelAssetInput.glbPath) ?? modelAssetInput.glbPath,
+      usdzPath: normalizeModelAssetUrl(modelAssetInput.usdzPath),
+      dimensionsMeters: modelAssetInput.dimensionsMeters,
+      normalizedScale: modelAssetInput.normalizedScale,
+      qaStatus: modelAssetInput.qaStatus,
+      sourceType: modelAssetInput.sourceType,
+      approvedAt: modelAssetInput.qaStatus === "approved" ? now : undefined,
+      version: "1.0.0",
+    };
+
+    const modelIndex = memoryState.carModels.findIndex((item) => item.id === modelId);
+    if (modelIndex >= 0) {
+      memoryState.carModels[modelIndex] = {
+        ...memoryState.carModels[modelIndex],
+        ...model,
+      };
+    } else {
+      memoryState.carModels.push(model);
+    }
+
+    resolvedModelRefId = modelId;
+  }
+
+  if (!resolvedModelRefId) {
+    throw new Error("Missing model reference. Provide modelRefId or modelAssetInput.");
+  }
+
   if (existingIndex >= 0) {
     const existing = memoryState.cars[existingIndex];
     const updated: CarListing = {
       ...existing,
-      ...input,
+      ...carFields,
       id: existing.id,
+      modelRefId: resolvedModelRefId,
       updatedAt: now,
     };
     memoryState.cars[existingIndex] = updated;
@@ -192,8 +270,9 @@ export async function createOrUpdateCar(input: CreateOrUpdateCarInput): Promise<
   }
 
   const created: CarListing = {
-    id: input.id ?? makeId("car"),
-    ...input,
+    id: carId,
+    ...carFields,
+    modelRefId: resolvedModelRefId,
     createdAt: now,
     updatedAt: now,
   };

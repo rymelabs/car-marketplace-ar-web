@@ -65,7 +65,7 @@ export function CarCard({ car }: CarCardProps) {
 
         <Link
           href={`/cars/${car.id}`}
-          className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-500 hover:text-slate-950"
+          className="inline-flex items-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold !text-white visited:!text-white hover:bg-amber-500 hover:!text-white focus-visible:!text-white active:!text-white"
         >
           View details
         </Link>

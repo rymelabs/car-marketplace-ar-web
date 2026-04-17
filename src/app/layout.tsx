@@ -9,7 +9,7 @@ const bodyFont = Manrope({
 });
 
 const headingFont = Space_Grotesk({
-  variable: "--font-heading",
+  variable: "--font-heading" ,
   subsets: ["latin"],
 });
 
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${bodyFont.variable} ${headingFont.variable} h-full`}>
-      <body className="min-h-full pb-24 font-body text-slate-900 antialiased">
+      <body suppressHydrationWarning className="min-h-full pb-24 font-body text-slate-900 antialiased">
         {children}
         <BottomNav />
       </body>
