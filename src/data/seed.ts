@@ -112,7 +112,7 @@ export const seedModels: CarModelAsset[] = [
   {
     id: "model_tesla_modely",
     carId: "car_tesla_modely_2024",
-    glbPath: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    glbPath: "/models/car_glb.glb",
     dimensionsMeters: {
       length: 4.75,
       width: 1.92,
@@ -129,7 +129,7 @@ export const seedModels: CarModelAsset[] = [
   {
     id: "model_ford_mustang",
     carId: "car_ford_mustang_2023",
-    glbPath: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    glbPath: "/models/car_glb.glb",
     dimensionsMeters: {
       length: 4.81,
       width: 1.92,
@@ -146,7 +146,7 @@ export const seedModels: CarModelAsset[] = [
   {
     id: "model_bmw_ix",
     carId: "car_bmw_ix_2025",
-    glbPath: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    glbPath: "/models/car_glb.glb",
     dimensionsMeters: {
       length: 4.95,
       width: 1.97,
@@ -165,7 +165,7 @@ export const seedModelUploads: ModelUploadItem[] = [
     id: "upload_bmw_ix_001",
     carId: "car_bmw_ix_2025",
     submittedBy: "uploader-demo",
-    glbPath: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    glbPath: "/models/car_glb.glb",
     dimensionsMeters: {
       length: 4.95,
       width: 1.97,
