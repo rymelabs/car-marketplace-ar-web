@@ -16,12 +16,12 @@ export async function generateMetadata({ params }: CarDetailPageProps): Promise<
 
   if (!car) {
     return {
-      title: "Car Not Found | Car Marketplace AR",
+      title: "Car Not Found | SpawnDrive",
     };
   }
 
   return {
-    title: `${car.year} ${car.make} ${car.model} ${car.trim} | Car Marketplace AR`,
+    title: `${car.year} ${car.make} ${car.model} ${car.trim} | SpawnDrive`,
     description: car.description,
   };
 }

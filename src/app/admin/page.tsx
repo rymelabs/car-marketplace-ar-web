@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
 
 export const metadata: Metadata = {
-  title: "Admin | Car Marketplace AR",
+  title: "Profile | SpawnDrive",
   description: "Manage car listings, model QA, and publication workflow.",
 };
 

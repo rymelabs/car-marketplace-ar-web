@@ -6,7 +6,7 @@ import { listCars, listMakesFromCars } from "@/lib/data/repository";
 import type { CarsQuery } from "@/types/marketplace";
 
 export const metadata: Metadata = {
-  title: "Car Marketplace AR",
+  title: "SpawnDrive",
   description:
     "Find your next car and preview it in your real space with true-scale augmented reality.",
 };
