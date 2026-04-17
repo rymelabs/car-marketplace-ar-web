@@ -37,6 +37,7 @@ public/models/*.glb
 
 # vercel
 .vercel
+.netlify
 
 # typescript
 *.tsbuildinfo
